@@ -10,7 +10,11 @@ var privateKey = fs.readFileSync('./ssl/server.key', 'utf8');
 var certificate= fs.readFileSync('./ssl/commote_net.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate };
 
-
+app.all('/', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+ });
 
 app.get('/scrape', function(req, res){
 	console.log("HI!\n");
