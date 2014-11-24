@@ -7,7 +7,7 @@ var cheerio = require('cheerio');
 var app     = express();
 
 var privateKey = fs.readFileSync('./ssl/server.key', 'utf8');
-var certificate= fs.readFileSync('./ssl/server.crt', 'utf8');
+var certificate= fs.readFileSync('./ssl/commote_net.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate };
 
 
@@ -30,15 +30,15 @@ app.get('/scrape', function(req, res){
 					return false; // break out of each loop
 				}
 			});
-			
-			
-			
+
+
+
 			request(url, function(error, response, html) { // professor page
 				if (!error) {
 					var $ = cheerio.load(html);
 					$('.rating-breakdown').filter(function() {
 						var data = $(this);
-						var overall = $('.grade', data).first().text();						
+						var overall = $('.grade', data).first().text();
 
 						var helpfulness = $(".label:contains('Helpfulness')", data).next().text();
 						var clarity = $(".label:contains('Clarity')", data).next().text();
@@ -54,11 +54,11 @@ app.get('/scrape', function(req, res){
 					res.send(json);
 				}
 			});
-			
+
 		}
-		
+
 	});
-	
+
 });
 
 https.createServer(credentials, app).listen('8081')
