@@ -10,14 +10,7 @@ var privateKey = fs.readFileSync('./ssl/server.key', 'utf8');
 var certificate= fs.readFileSync('./ssl/commote_net.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate };
 
-app.all('/', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
- });
-
 app.get('/scrape', function(req, res){
-	console.log("HI!\n");
 	url = 'http://www.ratemyprofessors.com/search.jsp?query=' + encodeURI(req.query.p);
 
 	var redirect = -1;
@@ -54,7 +47,9 @@ app.get('/scrape', function(req, res){
 						json.clarity = clarity;
 						json.easiness = easiness;
 					});
-					// Finally, we'll just send out a message to the browser reminding you that this app does not have a UI.
+
+					res.header("Access-Control-Allow-Origin", "*");
+					res.header("Access-Control-Allow-Headers", "X-Requested-With");
 					res.send(json);
 				}
 			});
