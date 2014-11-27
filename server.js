@@ -12,10 +12,9 @@ var credentials = {key: privateKey, cert: certificate };
 
 app.get('/scrape', function(req, res){
 	url = 'http://www.ratemyprofessors.com/search.jsp?query=' + encodeURI(req.query.p);
-
 	var redirect = -1;
-	var json = { overall : "", helpfulness : "", clarity : "", easiness: ""};
 	request(url, function(error, response, html){ // initial query
+		var json = { overall : "", helpfulness : "", clarity : "", easiness: ""};
 		if(!error){
 			var $ = cheerio.load(html);
 
@@ -28,8 +27,7 @@ app.get('/scrape', function(req, res){
 				}
 			});
 
-
-
+			if (redirect != -1)
 			request(url, function(error, response, html) { // professor page
 				if (!error) {
 					var $ = cheerio.load(html);
@@ -40,7 +38,6 @@ app.get('/scrape', function(req, res){
 						var helpfulness = $(".label:contains('Helpfulness')", data).next().text();
 						var clarity = $(".label:contains('Clarity')", data).next().text();
 						var easiness = $(".label:contains('Easiness')", data).next().text();
-						console.log(clarity);
 
 						json.overall = overall;
 						json.helpfulness = helpfulness;
@@ -48,12 +45,11 @@ app.get('/scrape', function(req, res){
 						json.easiness = easiness;
 					});
 
-					res.header("Access-Control-Allow-Origin", "*");
-					res.header("Access-Control-Allow-Headers", "X-Requested-With");
-					res.send(json);
 				}
-			});
+				sendResponse(res, json);
 
+			});
+			else sendResponse(res, json); // send negative response immediately if redirect=-1
 		}
 
 	});
@@ -65,3 +61,12 @@ http.createServer(app).listen('8082');
 console.log('Started on HTTPS port 8081');
 console.log('Started on HTTP port 8082');
 exports = module.exports = app;
+
+
+
+function sendResponse(res, json) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	res.send(json);
+}
+
